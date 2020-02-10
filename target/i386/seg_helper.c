@@ -1029,6 +1029,12 @@ void helper_syscall(CPUX86State *env, int next_eip_addend)
                                DESC_W_MASK | DESC_A_MASK);
         env->eip = (uint32_t)env->star;
     }
+
+    /* Inject tcg-plugin handler call. */
+    qemu_plugin_vcpu_syscall((CPUState *)container_of(env, X86CPU, env),
+                             env->regs[R_EAX], env->regs[R_EDI],
+                             env->regs[R_ESI], env->regs[R_EDX], env->regs[10],
+                             env->regs[8], env->regs[9], 0, 0);
 }
 #endif
 #endif
