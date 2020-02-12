@@ -409,4 +409,12 @@ int qemu_plugin_n_max_vcpus(void);
  */
 void qemu_plugin_outs(const char *string);
 
+
+/**
+ * qemu_plugin_in_kernel() - determine if is in kernel mode
+ *
+ * Returns true if current cpu is in kernel mode.
+ */
+bool qemu_plugin_in_kernel(void);
+
 #endif /* QEMU_PLUGIN_API_H */

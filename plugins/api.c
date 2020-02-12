@@ -339,3 +339,23 @@ void qemu_plugin_outs(const char *string)
 {
     qemu_log_mask(CPU_LOG_PLUGIN, "%s", string);
 }
+
+
+/**
+ * Determines if guest is currently executes in kernel mode.
+ */
+bool qemu_plugin_in_kernel(void) {
+    CPUState *cpu = current_cpu;
+    CPUArchState *env = (CPUArchState *)cpu->env_ptr;
+#if defined(TARGET_I386)
+    return ((env->hflags & HF_CPL_MASK) == 0);
+#elif defined(TARGET_ARM)
+    return ((env->uncached_cpsr & CPSR_M) == ARM_CPU_MODE_SVC);
+#elif defined(TARGET_PPC)
+    return msr_pr;
+#else
+#error "qemu_plugin_in_kernel() not implemented for target architecture."
+    return false;
+#endif
+}
+
