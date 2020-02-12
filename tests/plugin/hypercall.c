@@ -38,13 +38,15 @@ static void vcpu_mem(unsigned int cpu_index, qemu_plugin_meminfo_t meminfo,
     if (!mem_cb_on)
         return;
 
-    struct qemu_plugin_hwaddr *hwaddr;
-    hwaddr = qemu_plugin_get_hwaddr(meminfo, vaddr);
-    uint64_t paddr = qemu_plugin_hwaddr_device_offset(hwaddr);
-    mem_count++;
-    if (mem_count % 1000 == 0)
-        fprintf(stderr, "%c 0x%" PRIx64 " 0x%" PRIx64 "\n",
-                qemu_plugin_mem_is_store(meminfo)? 'w' : 'r', vaddr, paddr);
+    if (mem_count++ % 10000 == 0) {
+        struct qemu_plugin_hwaddr *hwaddr;
+        hwaddr = qemu_plugin_get_hwaddr(meminfo, vaddr);
+        uint64_t paddr = qemu_plugin_hwaddr_device_offset(hwaddr);
+
+        fprintf(stderr, "%c %c 0x%" PRIx64 " 0x%" PRIx64 "\n",
+                qemu_plugin_in_kernel() ? 'k' : 'u',
+                qemu_plugin_mem_is_store(meminfo) ? 'w' : 'r', vaddr, paddr);
+    }
 }
 
 
