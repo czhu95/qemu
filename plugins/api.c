@@ -344,7 +344,8 @@ void qemu_plugin_outs(const char *string)
 /**
  * Determines if guest is currently executes in kernel mode.
  */
-bool qemu_plugin_in_kernel(void) {
+bool qemu_plugin_in_kernel(void)
+{
     CPUState *cpu = current_cpu;
     CPUArchState *env = (CPUArchState *)cpu->env_ptr;
 #if defined(TARGET_I386)
@@ -359,3 +360,42 @@ bool qemu_plugin_in_kernel(void) {
 #endif
 }
 
+bool qemu_plugin_virt_mem_rw(uint64_t virt_addr, void *host_addr,
+                             uint32_t bytes, bool is_write, bool is_kernel)
+{
+#if defined(TARGET_I386)
+    CPUState *cpu = current_cpu;
+    unsigned int mmu_idx = is_kernel ? MMU_KNOSMAP_IDX : MMU_USER_IDX;
+#else
+#error "qemu_plugin_virtual_memory_rw() not implemented"
+       "for target architecture."
+    return false;
+#endif
+
+    uint64_t next_page;
+    uint32_t chunk_size;
+
+    while (bytes > 0) {
+        next_page = (virt_addr & TARGET_PAGE_MASK) + TARGET_PAGE_SIZE;
+        chunk_size = MIN(next_page - virt_addr, bytes);
+
+        if (!tlb_plugin_lookup(cpu, virt_addr, mmu_idx,
+                               is_write, &hwaddr_info)) {
+            error_report("invalid use of qemu_plugin_virtual_memory_rw");
+            return false;
+        }
+
+        if (hwaddr_info.is_io) {
+            error_report("Cannot copy memory between host and guest MMIO.");
+            return false;
+        }
+
+        if (is_write)
+            memcpy((void *)hwaddr_info.v.ram.hostaddr, host_addr, chunk_size);
+        else
+            memcpy(host_addr, (void *)hwaddr_info.v.ram.hostaddr, chunk_size);
+
+        bytes -= chunk_size;
+    }
+    return true;
+}
