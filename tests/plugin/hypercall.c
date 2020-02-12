@@ -20,6 +20,7 @@ QEMU_PLUGIN_EXPORT int qemu_plugin_version = QEMU_PLUGIN_VERSION;
 static bool mem_cb_on = false;
 static uint64_t mem_count = 0;
 static enum qemu_plugin_mem_rw rw = QEMU_PLUGIN_MEM_RW;
+static char buf[20] = "";
 
 static void vcpu_syscall_cb(qemu_plugin_id_t id, unsigned int vcpu_index,
                             int64_t num, uint64_t a1, uint64_t a2,
@@ -28,7 +29,11 @@ static void vcpu_syscall_cb(qemu_plugin_id_t id, unsigned int vcpu_index,
 {
     if (num == HYPERCALL_NUM) {
         mem_cb_on = !mem_cb_on;
-        fprintf(stderr, "Mem CB mode toggled.\n");
+        if (!qemu_plugin_virt_mem_rw(a1, buf, 19, false, false)) {
+            fprintf(stderr,
+                    "Fail to read guest virtual memory 0x%" PRIx64 "\n", a1);
+        }
+        fprintf(stderr, "guest> %s\n", buf);
     }
 }
 
