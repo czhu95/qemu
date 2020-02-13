@@ -13,7 +13,6 @@ NAMES += mem
 NAMES += hotblocks
 NAMES += howvec
 NAMES += hotpages
-NAMES += hypercall
 
 SONAMES := $(addsuffix .so,$(addprefix lib,$(NAMES)))
 

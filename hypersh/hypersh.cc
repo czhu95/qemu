@@ -4,12 +4,17 @@
  * License: GNU GPL, version 2 or later.
  *   See the COPYING file in the top-level directory.
  */
+
+#define __STDC_FORMAT_MACROS
+
 #include <inttypes.h>
 #include <assert.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
 #include <stdio.h>
+#include <vector>
+#include <map>
 
 #include <qemu-plugin.h>
 
@@ -62,6 +67,16 @@ static void hypercall_pmem(unsigned int cpu_id, qemu_plugin_meminfo_t meminfo,
 }
 /* ------------------------------------------------------------------------- */
 
+// static FILE *hc_mcount_file;
+static std::vector<uint32_t> kmap, umap;
+
+static void hypercall_mcount(unsigned int cpu_id, qemu_plugin_meminfo_t meminfo,
+                             uint64_t vaddr)
+{
+    kmap.clear();
+    umap.clear();
+}
+
 static void vcpu_syscall_cb(qemu_plugin_id_t id, unsigned int vcpu_index,
                             int64_t num, uint64_t a1, uint64_t a2,
                             uint64_t a3, uint64_t a4, uint64_t a5,
@@ -103,6 +118,9 @@ static void vcpu_mem(unsigned int cpu_index, qemu_plugin_meminfo_t meminfo,
 {
     if (hc_pmem_on)
         hypercall_pmem(cpu_index, meminfo, vaddr);
+
+    if (false)
+        hypercall_mcount(cpu_index, meminfo, vaddr);
 }
 
 
