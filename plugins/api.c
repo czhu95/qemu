@@ -45,6 +45,7 @@
 #ifndef CONFIG_USER_ONLY
 #include "qemu/plugin-memory.h"
 #include "hw/boards.h"
+#include "hw/mem/memory-device.h"
 #endif
 
 /* Uninstall and Reset handlers */
@@ -398,4 +399,14 @@ bool qemu_plugin_virt_mem_rw(uint64_t virt_addr, void *host_addr,
         bytes -= chunk_size;
     }
     return true;
+}
+
+uint64_t qemu_plugin_get_ram_size(void)
+{
+    return current_machine->ram_size;
+}
+
+unsigned int qemu_plugin_get_cpus(void)
+{
+    return current_machine->smp.cpus;
 }
