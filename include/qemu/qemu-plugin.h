@@ -53,10 +53,6 @@ extern QEMU_PLUGIN_EXPORT int qemu_plugin_version;
 
 #define QEMU_PLUGIN_VERSION 0
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 typedef struct {
     /* string describing architecture */
     const char *target_name;
@@ -427,8 +423,4 @@ bool qemu_plugin_virt_mem_rw(uint64_t virt_addr, void *host_addr,
 uint64_t qemu_plugin_get_ram_size(void);
 
 unsigned int qemu_plugin_get_cpus(void);
-#ifdef __cplusplus
-}
-#endif
-
 #endif /* QEMU_PLUGIN_API_H */
