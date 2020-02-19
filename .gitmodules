@@ -61,3 +61,6 @@
 [submodule "roms/qboot"]
 	path = roms/qboot
 	url = https://github.com/bonzini/qboot
+[submodule "hypersh"]
+	path = hypersh
+	url = git@github.com:czhu95/hypersh.git
