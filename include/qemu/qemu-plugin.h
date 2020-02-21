@@ -420,7 +420,6 @@ bool qemu_plugin_in_kernel(void);
 bool qemu_plugin_virt_mem_rw(uint64_t virt_addr, void *host_addr,
                              uint32_t bytes, bool is_write, bool is_kernel);
 
-uint64_t qemu_plugin_get_ram_size(void);
+uint64_t qemu_plugin_ram_size(void);
 
-unsigned int qemu_plugin_get_cpus(void);
 #endif /* QEMU_PLUGIN_API_H */

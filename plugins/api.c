@@ -401,12 +401,11 @@ bool qemu_plugin_virt_mem_rw(uint64_t virt_addr, void *host_addr,
     return true;
 }
 
-uint64_t qemu_plugin_get_ram_size(void)
+uint64_t qemu_plugin_ram_size(void)
 {
-    return current_machine->ram_size;
-}
-
-unsigned int qemu_plugin_get_cpus(void)
-{
-    return current_machine->smp.cpus;
+#ifdef CONFIG_USER_ONLY
+    return (uint64_t)-1;
+#else
+    return get_ms()->ram_size;
+#endif
 }
