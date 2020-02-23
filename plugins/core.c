@@ -500,3 +500,17 @@ static void __attribute__((__constructor__)) plugin_init(void)
              QHT_MODE_AUTO_RESIZE);
     atexit(qemu_plugin_atexit_cb);
 }
+
+qemu_plugin_id_t plugin_find_id_by_so(const char *soname)
+{
+    struct qemu_plugin_ctx *ctx;
+    size_t solen = strlen(soname);
+
+    QTAILQ_FOREACH(ctx, &plugin.ctxs, entry) {
+        const char *path = ctx->desc->path;
+        size_t pathlen = strlen(path);
+        if (pathlen > solen && !strcmp(path + pathlen - solen, soname))
+            return ctx->id;
+    }
+    return 0;
+}

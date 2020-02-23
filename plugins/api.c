@@ -409,3 +409,9 @@ uint64_t qemu_plugin_ram_size(void)
     return get_ms()->ram_size;
 #endif
 }
+
+qemu_plugin_id_t qemu_plugin_find_id(const char *soname)
+{
+    return plugin_find_id_by_so(soname);
+}
+

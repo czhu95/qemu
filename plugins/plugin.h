@@ -61,6 +61,13 @@ struct qemu_plugin_ctx {
     bool resetting;
 };
 
+struct qemu_plugin_desc {
+    char *path;
+    char **argv;
+    QTAILQ_ENTRY(qemu_plugin_desc) entry;
+    int argc;
+};
+
 struct qemu_plugin_ctx *plugin_id_to_ctx_locked(qemu_plugin_id_t id);
 
 void plugin_register_inline_op(GArray **arr,
@@ -95,5 +102,7 @@ void plugin_register_vcpu_mem_cb(GArray **arr,
                                  void *udata);
 
 void exec_inline_op(struct qemu_plugin_dyn_cb *cb);
+
+qemu_plugin_id_t plugin_find_id_by_so(const char *soname);
 
 #endif /* _PLUGIN_INTERNAL_H_ */

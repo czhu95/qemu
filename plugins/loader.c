@@ -40,13 +40,6 @@
  */
 QEMU_BUILD_BUG_ON(QEMU_PLUGIN_EV_MAX > 32);
 
-struct qemu_plugin_desc {
-    char *path;
-    char **argv;
-    QTAILQ_ENTRY(qemu_plugin_desc) entry;
-    int argc;
-};
-
 struct qemu_plugin_parse_arg {
     QemuPluginList *head;
     struct qemu_plugin_desc *curr;

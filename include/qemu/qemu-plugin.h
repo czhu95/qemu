@@ -422,4 +422,6 @@ bool qemu_plugin_virt_mem_rw(uint64_t virt_addr, void *host_addr,
 
 uint64_t qemu_plugin_ram_size(void);
 
+qemu_plugin_id_t qemu_plugin_find_id(const char* soname);
+
 #endif /* QEMU_PLUGIN_API_H */
