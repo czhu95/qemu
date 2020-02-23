@@ -415,3 +415,8 @@ qemu_plugin_id_t qemu_plugin_find_id(const char *soname)
     return plugin_find_id_by_so(soname);
 }
 
+int qemu_plugin_send_control(qemu_plugin_id_t id, int argc, char *argv[])
+{
+    return plugin_send_control(id, argc, argv);
+}
+

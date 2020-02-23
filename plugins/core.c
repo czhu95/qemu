@@ -514,3 +514,21 @@ qemu_plugin_id_t plugin_find_id_by_so(const char *soname)
     }
     return 0;
 }
+
+int plugin_send_control(qemu_plugin_id_t id, int argc, char *argv[])
+{
+    struct qemu_plugin_ctx *ctx;
+    int retval;
+    qemu_plugin_id_t *id_p;
+
+    qemu_rec_mutex_lock(&plugin.lock);
+    id_p = g_hash_table_lookup(plugin.id_ht, &id);
+    ctx = container_of(id_p, struct qemu_plugin_ctx, id);
+    if (ctx && ctx->ctrl)
+        retval = ctx->ctrl(id, argc, argv);
+    else
+        retval = -1;
+
+    qemu_rec_mutex_unlock(&plugin.lock);
+    return retval;
+}

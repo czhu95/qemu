@@ -45,12 +45,14 @@ struct qemu_plugin_state {
     struct qht dyn_cb_arr_ht;
 };
 
+typedef int (*qemu_plugin_control_func_t)(qemu_plugin_id_t, int, char **);
 
 struct qemu_plugin_ctx {
     GModule *handle;
     qemu_plugin_id_t id;
     struct qemu_plugin_cb *callbacks[QEMU_PLUGIN_EV_MAX];
     QTAILQ_ENTRY(qemu_plugin_ctx) entry;
+    qemu_plugin_control_func_t ctrl;
     /*
      * keep a reference to @desc until uninstall, so that plugins do not have
      * to strdup plugin args.
@@ -104,5 +106,7 @@ void plugin_register_vcpu_mem_cb(GArray **arr,
 void exec_inline_op(struct qemu_plugin_dyn_cb *cb);
 
 qemu_plugin_id_t plugin_find_id_by_so(const char *soname);
+
+int plugin_send_control(qemu_plugin_id_t id, int argc, char* argv[]);
 
 #endif /* _PLUGIN_INTERNAL_H_ */

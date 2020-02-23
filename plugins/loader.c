@@ -171,6 +171,11 @@ static int plugin_load(struct qemu_plugin_desc *desc, const qemu_info_t *info)
         goto err_symbol;
     }
 
+    if (g_module_symbol(ctx->handle, "qemu_plugin_control", &sym))
+        ctx->ctrl = (qemu_plugin_control_func_t) sym;
+    else
+        ctx->ctrl = NULL;
+
     if (!g_module_symbol(ctx->handle, "qemu_plugin_version", &sym)) {
         error_report("TCG plugin %s does not declare API version %s",
                      desc->path, g_module_error());

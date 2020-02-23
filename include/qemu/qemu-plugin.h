@@ -95,6 +95,18 @@ QEMU_PLUGIN_EXPORT int qemu_plugin_install(qemu_plugin_id_t id,
                                            const qemu_info_t *info,
                                            int argc, char **argv);
 
+/**
+ * qemu_plugin_control() - Control a plugin at runtime
+ * @id: this plugin's opaque ID
+ * @argc: number of arguments
+ * @argv: array of arguments (@argc elements)
+ *
+ * This symbol is optional. Plugins with qemu_plugin_control implemented allow
+ * other plugins to send control commands at runtime.
+ */
+QEMU_PLUGIN_EXPORT int qemu_plugin_control(qemu_plugin_id_t id,
+                                           int argc, char **argv);
+
 /*
  * Prototypes for the various callback styles we will be registering
  * in the following functions.
@@ -423,5 +435,7 @@ bool qemu_plugin_virt_mem_rw(uint64_t virt_addr, void *host_addr,
 uint64_t qemu_plugin_ram_size(void);
 
 qemu_plugin_id_t qemu_plugin_find_id(const char* soname);
+
+int qemu_plugin_send_control(qemu_plugin_id_t id, int argc, char *argv[]);
 
 #endif /* QEMU_PLUGIN_API_H */
