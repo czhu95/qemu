@@ -52,6 +52,7 @@ typedef uint64_t qemu_plugin_id_t;
 extern QEMU_PLUGIN_EXPORT int qemu_plugin_version;
 
 #define QEMU_PLUGIN_VERSION 0
+#define QEMU_PLUGIN_ID_NULL 0
 
 typedef struct {
     /* string describing architecture */

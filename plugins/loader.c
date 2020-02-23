@@ -204,7 +204,8 @@ static int plugin_load(struct qemu_plugin_desc *desc, const qemu_info_t *info)
 
         ctx->id = xorshift64star(ctx->id);
         existing = g_hash_table_lookup(plugin.id_ht, &ctx->id);
-        if (likely(existing == NULL)) {
+        /* Reserve 0 for invalid id lookup return value. */
+        if (likely(existing == NULL && ctx->id != 0)) {
             bool success;
 
             success = g_hash_table_insert(plugin.id_ht, &ctx->id, &ctx->id);

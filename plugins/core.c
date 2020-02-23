@@ -512,7 +512,7 @@ qemu_plugin_id_t plugin_find_id_by_so(const char *soname)
         if (pathlen > solen && !strcmp(path + pathlen - solen, soname))
             return ctx->id;
     }
-    return 0;
+    return QEMU_PLUGIN_ID_NULL;
 }
 
 int plugin_send_control(qemu_plugin_id_t id, int argc, char *argv[])
