@@ -438,4 +438,6 @@ qemu_plugin_id_t qemu_plugin_find_id(const char* soname);
 
 int qemu_plugin_send_control(qemu_plugin_id_t id, int argc, char *argv[]);
 
+void qemu_plugin_tb_flush(void);
+
 #endif /* QEMU_PLUGIN_API_H */

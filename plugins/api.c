@@ -420,3 +420,8 @@ int qemu_plugin_send_control(qemu_plugin_id_t id, int argc, char *argv[])
     return plugin_send_control(id, argc, argv);
 }
 
+void qemu_plugin_tb_flush(void)
+{
+    tb_flush(current_cpu);
+}
+
