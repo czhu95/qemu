@@ -1,6 +1,8 @@
 #!/bin/bash
 CORES=2
 
+PLUGINS=(hypersh pmem mcount)
+
 while getopts "dn:" opt; do
     case "$opt" in
         d)
@@ -12,13 +14,12 @@ while getopts "dn:" opt; do
     esac
 done
 
-if [ -z $debug ]
-then
+if [ -z $debug ]; then
     QEMU=./build/x86_64-softmmu/qemu-system-x86_64
-    PLUGIN=./hypersh/host/libhypersh.so
+    PLUGIN_SUFFIX=""
 else
     QEMU=./build/debug/x86_64-softmmu/qemu-system-x86_64
-    PLUGIN=./hypersh/host/libhypersh.sod
+    PLUGIN_SUFFIX="d"
 fi
 
 HDA=../panda/images/xpsp3.qcow2
@@ -31,11 +32,14 @@ for c in $(seq 0 $((CORES-1))); do
     SMP+=" -numa cpu,node-id=${c},socket-id=${c}"
 done
 
-QEMU_ARGS="-hda ${HDA} -vnc ${VNC} -plugin ${PLUGIN} -m ${MEM} -smp ${SMP}"
+for p in ${PLUGINS[@]}; do
+    PLUGIN_ARGS+=" -plugin ./hypersh/host/lib${p}.so${PLUGIN_SUFFIX}"
+done
+
+QEMU_ARGS="-hda ${HDA} -vnc ${VNC} ${PLUGIN_ARGS} -m ${MEM} -smp ${SMP}"
 echo ${QEMU} ${QEMU_ARGS}
 
-if [ -z $debug ]
-then
+if [ -z $debug ]; then
     ${QEMU} ${QEMU_ARGS}
 else
     gdb --args ${QEMU} ${QEMU_ARGS}
