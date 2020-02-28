@@ -106,6 +106,7 @@ QEMU_PLUGIN_EXPORT int qemu_plugin_install(qemu_plugin_id_t id,
  * other plugins to send control commands at runtime.
  */
 QEMU_PLUGIN_EXPORT int qemu_plugin_control(qemu_plugin_id_t id,
+                                           unsigned int vcpu_index,
                                            int argc, char **argv);
 
 /*
@@ -437,7 +438,8 @@ uint64_t qemu_plugin_ram_size(void);
 
 qemu_plugin_id_t qemu_plugin_find_id(const char* soname);
 
-int qemu_plugin_send_control(qemu_plugin_id_t id, int argc, char *argv[]);
+int qemu_plugin_send_control(qemu_plugin_id_t id, unsigned int vcpu_index,
+                             int argc, char *argv[]);
 
 void qemu_plugin_tb_flush(void);
 

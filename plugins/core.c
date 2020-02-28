@@ -515,7 +515,8 @@ qemu_plugin_id_t plugin_find_id_by_so(const char *soname)
     return QEMU_PLUGIN_ID_NULL;
 }
 
-int plugin_send_control(qemu_plugin_id_t id, int argc, char *argv[])
+int plugin_send_control(qemu_plugin_id_t id, unsigned int vcpu_index,
+                        int argc, char *argv[])
 {
     struct qemu_plugin_ctx *ctx;
     int retval;
@@ -525,7 +526,7 @@ int plugin_send_control(qemu_plugin_id_t id, int argc, char *argv[])
     id_p = g_hash_table_lookup(plugin.id_ht, &id);
     ctx = container_of(id_p, struct qemu_plugin_ctx, id);
     if (ctx && ctx->ctrl)
-        retval = ctx->ctrl(id, argc, argv);
+        retval = ctx->ctrl(id, vcpu_index, argc, argv);
     else
         retval = -1;
 

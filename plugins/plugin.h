@@ -45,7 +45,8 @@ struct qemu_plugin_state {
     struct qht dyn_cb_arr_ht;
 };
 
-typedef int (*qemu_plugin_control_func_t)(qemu_plugin_id_t, int, char **);
+typedef int (*qemu_plugin_control_func_t)(qemu_plugin_id_t, unsigned int,
+                                          int, char **);
 
 struct qemu_plugin_ctx {
     GModule *handle;
@@ -107,6 +108,7 @@ void exec_inline_op(struct qemu_plugin_dyn_cb *cb);
 
 qemu_plugin_id_t plugin_find_id_by_so(const char *soname);
 
-int plugin_send_control(qemu_plugin_id_t id, int argc, char* argv[]);
+int plugin_send_control(qemu_plugin_id_t id, unsigned int vcpu_index,
+                        int argc, char* argv[]);
 
 #endif /* _PLUGIN_INTERNAL_H_ */

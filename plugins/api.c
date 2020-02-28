@@ -415,9 +415,10 @@ qemu_plugin_id_t qemu_plugin_find_id(const char *soname)
     return plugin_find_id_by_so(soname);
 }
 
-int qemu_plugin_send_control(qemu_plugin_id_t id, int argc, char *argv[])
+int qemu_plugin_send_control(qemu_plugin_id_t id, unsigned int vcpu_index,
+                             int argc, char *argv[])
 {
-    return plugin_send_control(id, argc, argv);
+    return plugin_send_control(id, vcpu_index, argc, argv);
 }
 
 void qemu_plugin_tb_flush(void)
