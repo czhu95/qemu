@@ -214,6 +214,11 @@ void *qemu_plugin_insn_haddr(const struct qemu_plugin_insn *insn)
     return insn->haddr;
 }
 
+uint64_t qemu_plugin_insn_ram_addr(const struct qemu_plugin_insn *insn)
+{
+    return qemu_ram_addr_from_host(qemu_plugin_insn_haddr(insn));
+}
+
 char *qemu_plugin_insn_disas(const struct qemu_plugin_insn *insn)
 {
     CPUState *cpu = current_cpu;
