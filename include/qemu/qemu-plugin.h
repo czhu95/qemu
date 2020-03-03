@@ -444,4 +444,6 @@ int qemu_plugin_send_control(qemu_plugin_id_t id, unsigned int vcpu_index,
 
 void qemu_plugin_tb_flush(void);
 
+void qemu_plugin_vcpu_tb_flush(qemu_plugin_id_t id, qemu_plugin_vcpu_simple_cb_t cb);
+
 #endif /* QEMU_PLUGIN_API_H */

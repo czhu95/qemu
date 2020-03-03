@@ -31,6 +31,17 @@
 #include "trace/mem-internal.h" /* mem_info macros */
 #include "plugin.h"
 
+#ifdef DEBUG
+#include <sys/syscall.h>
+#define qemu_rec_mutex_lock_print(lock) \
+    qemu_rec_mutex_lock(lock);    \
+    fprintf(stderr, "[%ld] %s locked.\n", syscall(SYS_gettid), __func__);
+
+#define qemu_rec_mutex_unlock_print(lock) \
+    qemu_rec_mutex_unlock(lock);    \
+    fprintf(stderr, "[%ld] %s unlocked.\n", syscall(SYS_gettid), __func__);
+#endif
+
 struct qemu_plugin_cb {
     struct qemu_plugin_ctx *ctx;
     union qemu_plugin_cb_sig f;
@@ -533,4 +544,41 @@ int plugin_send_control(qemu_plugin_id_t id, unsigned int vcpu_index,
 
     qemu_rec_mutex_unlock(&plugin.lock);
     return retval;
+}
+
+struct plugin_vcpu_tb_flush_data
+{
+    struct qemu_plugin_ctx *ctx;
+    qemu_plugin_vcpu_simple_cb_t cb;
+};
+
+static void plugin_vcpu_tb_flush(CPUState *cpu, run_on_cpu_data args)
+{
+    struct plugin_vcpu_tb_flush_data *data = args.host_ptr;
+    tb_flush(cpu);
+    if (data->cb)
+        data->cb(data->ctx->id, cpu->cpu_index);
+    g_free(data);
+}
+
+void qemu_plugin_vcpu_tb_flush(qemu_plugin_id_t id,
+                               qemu_plugin_vcpu_simple_cb_t cb)
+{
+    struct qemu_plugin_ctx *ctx;
+    struct plugin_vcpu_tb_flush_data *data;
+    qemu_rec_mutex_lock(&plugin.lock);
+    ctx = plugin_id_to_ctx_locked(id);
+    qemu_rec_mutex_unlock(&plugin.lock);
+
+    if (cb != NULL) {
+        data = g_new(struct plugin_vcpu_tb_flush_data, 1);
+        data->ctx = ctx;
+        data->cb = cb;
+
+        assert(current_cpu);
+        async_safe_run_on_cpu(current_cpu, plugin_vcpu_tb_flush,
+                              RUN_ON_CPU_HOST_PTR(data));
+    } else {
+        tb_flush(current_cpu);
+    }
 }
