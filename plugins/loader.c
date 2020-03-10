@@ -34,6 +34,16 @@
 
 #include "plugin.h"
 
+#ifdef DEBUG
+#include <sys/syscall.h>
+#define qemu_rec_mutex_lock_print(lock) \
+    qemu_rec_mutex_lock(lock);    \
+    fprintf(stderr, "[%ld] %s locked.\n", syscall(SYS_gettid), __func__);
+
+#define qemu_rec_mutex_unlock_print(lock) \
+    qemu_rec_mutex_unlock(lock);    \
+    fprintf(stderr, "[%ld] %s unlocked.\n", syscall(SYS_gettid), __func__);
+#endif
 /*
  * For convenience we use a bitmap for plugin.mask, but really all we need is a
  * u32, which is what we store in TranslationBlock.
@@ -384,7 +394,7 @@ void plugin_reset_uninstall(qemu_plugin_id_t id,
      * Only flush the code cache if the vCPUs have been created. If so,
      * current_cpu must be non-NULL.
      */
-    if (current_cpu) {
+    if (current_cpu && !cpu_in_exclusive_context(current_cpu)) {
         async_safe_run_on_cpu(current_cpu, plugin_flush_destroy,
                               RUN_ON_CPU_HOST_PTR(data));
     } else {

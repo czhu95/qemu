@@ -36,6 +36,7 @@ void translator_loop(const TranslatorOps *ops, DisasContextBase *db,
 {
     int bp_insn = 0;
     bool plugin_enabled;
+    bool is_branch;
 
     /* Initialize DisasContext */
     db->tb = tb;
@@ -112,7 +113,7 @@ void translator_loop(const TranslatorOps *ops, DisasContextBase *db,
          * flow although this only really affects post-load operations.
          */
         if (plugin_enabled) {
-            plugin_gen_insn_end();
+            plugin_gen_insn_end(db->pc_next);
         }
 
         /* Stop translation if the output buffer is full,
@@ -124,11 +125,12 @@ void translator_loop(const TranslatorOps *ops, DisasContextBase *db,
     }
 
     /* Emit code to exit the TB, as indicated by db->is_jmp.  */
+    is_branch = db->is_jmp != DISAS_TOO_MANY;
     ops->tb_stop(db, cpu);
     gen_tb_end(db->tb, db->num_insns - bp_insn);
 
     if (plugin_enabled) {
-        plugin_gen_tb_end(cpu);
+        plugin_gen_tb_end(cpu, is_branch, db->pc_next);
     }
 
     /* The disas_log hook may use these values rather than recompute.  */

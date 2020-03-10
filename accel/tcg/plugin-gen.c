@@ -905,15 +905,32 @@ void plugin_gen_insn_start(CPUState *cpu, const DisasContextBase *db)
     }
 }
 
-void plugin_gen_insn_end(void)
+void plugin_gen_insn_end(target_ulong pc_next)
 {
+#if defined(TARGET_I386)
+    tcg_ctx->plugin_insn->pc_next = pc_next;
+#endif
     plugin_gen_empty_callback(PLUGIN_GEN_AFTER_INSN);
 }
 
-void plugin_gen_tb_end(CPUState *cpu)
+void plugin_gen_tb_end(CPUState *cpu, bool is_branch, target_ulong pc_next)
 {
     struct qemu_plugin_tb *ptb = tcg_ctx->plugin_tb;
     int i;
+
+#if defined(TARGET_I386)
+    ptb->is_branch = is_branch;
+    ptb->pc_next = pc_next;
+    tcg_ctx->plugin_insn->pc_next = pc_next;
+#endif
+
+    if (likely(ptb->haddr1 != NULL && ptb->vaddr2 == -1) &&
+        unlikely(((ptb->pc_next - 1) & TARGET_PAGE_MASK) !=
+                 (ptb->vaddr & TARGET_PAGE_MASK))) {
+        get_page_addr_code_hostp(cpu->env_ptr, ptb->pc_next - 1,
+                                 &ptb->haddr2);
+        ptb->vaddr2 = ptb->pc_next - 1;
+    }
 
     /* collect instrumentation requests */
     qemu_plugin_tb_trans_cb(cpu, ptb);

@@ -1332,6 +1332,8 @@ bool x86_cpu_exec_interrupt(CPUState *cs, int interrupt_request)
         return false;
     }
 
+    qemu_plugin_vcpu_interrupt_cb(cs);
+
     /* Don't process multiple interrupt requests in a single call.
      * This is required to make icount-driven execution deterministic.
      */
@@ -2343,6 +2345,9 @@ void helper_iret_protected(CPUX86State *env, int shift, int next_eip)
 {
     int tss_selector, type;
     uint32_t e1, e2;
+
+    CPUState *cpu = (CPUState *)container_of(env, X86CPU, env);
+    qemu_plugin_vcpu_interrupt_ret_cb(cpu);
 
     /* specific case for TSS */
     if (env->eflags & NT_MASK) {

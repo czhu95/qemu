@@ -298,6 +298,13 @@ void qemu_plugin_register_vcpu_insn_exec_inline(struct qemu_plugin_insn *insn,
 size_t qemu_plugin_tb_n_insns(const struct qemu_plugin_tb *tb);
 
 uint64_t qemu_plugin_tb_vaddr(const struct qemu_plugin_tb *tb);
+uint64_t qemu_plugin_tb_vaddr2(const struct qemu_plugin_tb *tb);
+const void *qemu_plugin_tb_haddr(const struct qemu_plugin_tb *tb);
+const void *qemu_plugin_tb_haddr2(const struct qemu_plugin_tb *tb);
+
+bool qemu_plugin_tb_is_branch(const struct qemu_plugin_tb *tb);
+
+uint64_t qemu_plugin_tb_next_pc(const struct qemu_plugin_tb *tb);
 
 struct qemu_plugin_insn *
 qemu_plugin_tb_get_insn(const struct qemu_plugin_tb *tb, size_t idx);
@@ -309,6 +316,7 @@ size_t qemu_plugin_insn_size(const struct qemu_plugin_insn *insn);
 uint64_t qemu_plugin_insn_vaddr(const struct qemu_plugin_insn *insn);
 void *qemu_plugin_insn_haddr(const struct qemu_plugin_insn *insn);
 uint64_t qemu_plugin_insn_ram_addr(const struct qemu_plugin_insn *insn);
+uint64_t qemu_plugin_insn_next(const struct qemu_plugin_insn *insn);
 
 /*
  * Memory Instrumentation
@@ -384,6 +392,11 @@ void
 qemu_plugin_register_vcpu_syscall_ret_cb(qemu_plugin_id_t id,
                                          qemu_plugin_vcpu_syscall_ret_cb_t cb);
 
+void qemu_plugin_register_vcpu_interrupt_cb(qemu_plugin_id_t id,
+                                            qemu_plugin_vcpu_simple_cb_t cb);
+
+void qemu_plugin_register_vcpu_interrupt_ret_cb(qemu_plugin_id_t id,
+                                                qemu_plugin_vcpu_simple_cb_t cb);
 
 /**
  * qemu_plugin_insn_disas() - return disassembly string for instruction
@@ -393,6 +406,8 @@ qemu_plugin_register_vcpu_syscall_ret_cb(qemu_plugin_id_t id,
  */
 
 char *qemu_plugin_insn_disas(const struct qemu_plugin_insn *insn);
+
+void qemu_plugin_insn_bytes(const struct qemu_plugin_insn *insn, uint8_t *buf);
 
 /**
  * qemu_plugin_vcpu_for_each() - iterate over the existing vCPU
@@ -434,6 +449,8 @@ bool qemu_plugin_in_kernel(void);
 
 bool qemu_plugin_virt_mem_rw(uint64_t virt_addr, void *host_addr,
                              uint32_t bytes, bool is_write, bool is_kernel);
+
+uint64_t qemu_plugin_page_directory(void);
 
 uint64_t qemu_plugin_ram_size(void);
 

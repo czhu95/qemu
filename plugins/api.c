@@ -178,6 +178,31 @@ uint64_t qemu_plugin_tb_vaddr(const struct qemu_plugin_tb *tb)
     return tb->vaddr;
 }
 
+uint64_t qemu_plugin_tb_vaddr2(const struct qemu_plugin_tb *tb)
+{
+    return tb->vaddr2;
+}
+
+const void *qemu_plugin_tb_haddr(const struct qemu_plugin_tb *tb)
+{
+    return tb->haddr1;
+}
+
+const void *qemu_plugin_tb_haddr2(const struct qemu_plugin_tb *tb)
+{
+    return tb->haddr2;
+}
+
+bool qemu_plugin_tb_is_branch(const struct qemu_plugin_tb *tb)
+{
+    return tb->is_branch;
+}
+
+uint64_t qemu_plugin_tb_next_pc(const struct qemu_plugin_tb *tb)
+{
+    return tb->pc_next;
+}
+
 struct qemu_plugin_insn *
 qemu_plugin_tb_get_insn(const struct qemu_plugin_tb *tb, size_t idx)
 {
@@ -219,10 +244,21 @@ uint64_t qemu_plugin_insn_ram_addr(const struct qemu_plugin_insn *insn)
     return qemu_ram_addr_from_host(qemu_plugin_insn_haddr(insn));
 }
 
+uint64_t qemu_plugin_insn_next(const struct qemu_plugin_insn *insn)
+{
+    return insn->pc_next;
+}
+
 char *qemu_plugin_insn_disas(const struct qemu_plugin_insn *insn)
 {
     CPUState *cpu = current_cpu;
     return plugin_disas(cpu, insn->vaddr, insn->data->len);
+}
+
+void qemu_plugin_insn_bytes(const struct qemu_plugin_insn *insn, uint8_t *buf)
+{
+    cpu_memory_rw_debug(current_cpu, insn->vaddr, buf,
+                        insn->data->len, false);
 }
 
 /*
@@ -429,5 +465,21 @@ int qemu_plugin_send_control(qemu_plugin_id_t id, unsigned int vcpu_index,
 void qemu_plugin_tb_flush(void)
 {
     tb_flush(current_cpu);
+}
+
+uint64_t qemu_plugin_page_directory(void)
+{
+
+    CPUState *cpu = current_cpu;
+    CPUArchState *env = (CPUArchState *)cpu->env_ptr;
+#if defined(TARGET_I386)
+    return env->cr[3];
+#else
+#error "qemu_plugin_page_directory() not implemented"
+       "for target architecture."
+    return (uint64_t)-1;
+#endif
+
+
 }
 

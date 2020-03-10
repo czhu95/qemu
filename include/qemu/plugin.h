@@ -58,6 +58,8 @@ enum qemu_plugin_event {
     QEMU_PLUGIN_EV_VCPU_RESUME,
     QEMU_PLUGIN_EV_VCPU_SYSCALL,
     QEMU_PLUGIN_EV_VCPU_SYSCALL_RET,
+    QEMU_PLUGIN_EV_VCPU_INTERRUPT,
+    QEMU_PLUGIN_EV_VCPU_INTERRUPT_RET,
     QEMU_PLUGIN_EV_FLUSH,
     QEMU_PLUGIN_EV_ATEXIT,
     QEMU_PLUGIN_EV_MAX, /* total number of plugin events we support */
@@ -112,6 +114,7 @@ struct qemu_plugin_insn {
     GByteArray *data;
     uint64_t vaddr;
     void *haddr;
+    uint64_t pc_next;
     GArray *cbs[PLUGIN_N_CB_TYPES][PLUGIN_N_CB_SUBTYPES];
     bool calls_helpers;
     bool mem_helper;
@@ -151,6 +154,8 @@ struct qemu_plugin_tb {
     uint64_t vaddr2;
     void *haddr1;
     void *haddr2;
+    bool is_branch;
+    uint64_t pc_next;
     GArray *cbs[PLUGIN_N_CB_SUBTYPES];
 };
 
@@ -205,6 +210,10 @@ void qemu_plugin_add_dyn_cb_arr(GArray *arr);
 
 void qemu_plugin_disable_mem_helpers(CPUState *cpu);
 
+void qemu_plugin_vcpu_interrupt_cb(CPUState *cpu);
+
+void qemu_plugin_vcpu_interrupt_ret_cb(CPUState *cpu);
+
 #else /* !CONFIG_PLUGIN */
 
 static inline void qemu_plugin_vcpu_init_hook(CPUState *cpu)
@@ -248,6 +257,13 @@ void qemu_plugin_add_dyn_cb_arr(GArray *arr)
 { }
 
 static inline void qemu_plugin_disable_mem_helpers(CPUState *cpu)
+{ }
+
+
+static void qemu_plugin_vcpu_interrupt_cb(CPUState *cpu)
+{ }
+
+static void qemu_plugin_vcpu_interrupt_ret_cb(CPUState *cpu)
 { }
 
 #endif /* !CONFIG_PLUGIN */
