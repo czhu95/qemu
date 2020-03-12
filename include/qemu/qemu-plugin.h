@@ -448,7 +448,7 @@ void qemu_plugin_outs(const char *string);
 bool qemu_plugin_in_kernel(void);
 
 bool qemu_plugin_virt_mem_rw(uint64_t virt_addr, void *host_addr,
-                             uint32_t bytes, bool is_write, bool is_kernel);
+                             uint32_t bytes, bool is_write);
 
 uint64_t qemu_plugin_page_directory(void);
 
