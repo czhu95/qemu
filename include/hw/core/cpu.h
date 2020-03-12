@@ -856,6 +856,10 @@ bool cpu_throttle_active(void);
  */
 int cpu_throttle_get_percentage(void);
 
+/* slomo */
+void qemu_clock_set_slomo(unsigned int new_slomo_rate);
+unsigned int qemu_clock_get_slomo(void);
+
 #ifndef CONFIG_USER_ONLY
 
 typedef void (*CPUInterruptHandler)(CPUState *, int);

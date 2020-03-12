@@ -1,7 +1,7 @@
 #!/bin/bash
 CORES=2
 
-PLUGINS=(hypersh pmem mcount trace)
+PLUGINS=(hypersh pmem mcount trace slomo)
 
 while getopts "dn:" opt; do
     case "$opt" in

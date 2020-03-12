@@ -479,7 +479,10 @@ uint64_t qemu_plugin_page_directory(void)
        "for target architecture."
     return (uint64_t)-1;
 #endif
-
-
 }
 
+void qemu_plugin_set_slomo_rate(unsigned int rate)
+{
+    if (rate > 0)
+        qemu_clock_set_slomo(rate);
+}

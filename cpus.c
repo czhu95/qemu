@@ -86,6 +86,7 @@ int64_t max_advance;
 /* vcpu throttling controls */
 static QEMUTimer *throttle_timer;
 static unsigned int throttle_percentage;
+static unsigned int vm_slomo_rate;
 
 #define CPU_THROTTLE_PCT_MIN 1
 #define CPU_THROTTLE_PCT_MAX 99
@@ -161,6 +162,9 @@ typedef struct TimersState {
     QEMUTimer *icount_rt_timer;
     QEMUTimer *icount_vm_timer;
     QEMUTimer *icount_warp_timer;
+
+    /* Slo-mo start vm time */
+    int64_t vm_clock_checkpoint;
 } TimersState;
 
 static TimersState timers_state;
@@ -371,9 +375,9 @@ static int64_t cpu_get_clock_locked(void)
 {
     int64_t time;
 
-    time = timers_state.cpu_clock_offset;
+    time = timers_state.vm_clock_checkpoint;
     if (timers_state.cpu_ticks_enabled) {
-        time += get_clock();
+        time += (get_clock() + timers_state.cpu_clock_offset) / vm_slomo_rate;
     }
 
     return time;
@@ -405,6 +409,7 @@ void cpu_enable_ticks(void)
     if (!timers_state.cpu_ticks_enabled) {
         timers_state.cpu_ticks_offset -= cpu_get_host_ticks();
         timers_state.cpu_clock_offset -= get_clock();
+        timers_state.vm_clock_checkpoint = 0;
         timers_state.cpu_ticks_enabled = 1;
     }
     seqlock_write_unlock(&timers_state.vm_clock_seqlock,
@@ -865,6 +870,7 @@ void cpu_ticks_init(void)
     vmstate_register(NULL, 0, &vmstate_timers, &timers_state);
     throttle_timer = timer_new_ns(QEMU_CLOCK_VIRTUAL_RT,
                                            cpu_throttle_timer_tick, NULL);
+    atomic_set(&vm_slomo_rate, 1);
 }
 
 void configure_icount(QemuOpts *opts, Error **errp)
@@ -2338,4 +2344,28 @@ void dump_drift_info(void)
         qemu_printf("Max guest delay     NA\n");
         qemu_printf("Max guest advance   NA\n");
     }
+}
+
+static void cpu_update_slomo_checkpoint(void)
+{
+    seqlock_write_lock(&timers_state.vm_clock_seqlock,
+                       &timers_state.vm_clock_lock);
+    if (timers_state.cpu_ticks_enabled) {
+        timers_state.vm_clock_checkpoint = cpu_get_clock_locked();
+        timers_state.cpu_clock_offset = -get_clock();
+    }
+    seqlock_write_unlock(&timers_state.vm_clock_seqlock,
+                         &timers_state.vm_clock_lock);
+}
+
+void qemu_clock_set_slomo(unsigned int new_slomo_rate)
+{
+    assert(new_slomo_rate != 0);
+    cpu_update_slomo_checkpoint();
+    atomic_set(&vm_slomo_rate, new_slomo_rate);
+}
+
+unsigned int qemu_clock_get_slomo(void)
+{
+    return atomic_read(&vm_slomo_rate);
 }
