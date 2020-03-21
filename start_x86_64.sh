@@ -1,14 +1,18 @@
 #!/bin/bash
 CORES=2
+NODES=1
 
 PLUGINS=(hypersh pmem mcount trace slomo)
 
-while getopts "dn:" opt; do
+while getopts "dn:c:" opt; do
     case "$opt" in
         d)
             debug=1
             ;;
         n)
+            NODES=$OPTARG
+            ;;
+        c)
             CORES=$OPTARG
             ;;
     esac
@@ -24,12 +28,13 @@ fi
 
 HDA=../panda/images/xpsp3.qcow2
 VNC=0.0.0.0:5900
-MEM=${CORES}G
-SMP=${CORES},sockets=${CORES}
-for c in $(seq 0 $((CORES-1))); do
-    SMP+=" -object memory-backend-ram,id=mem${c},size=1G"
-    SMP+=" -numa node,nodeid=${c},memdev=mem${c}"
-    SMP+=" -numa cpu,node-id=${c},socket-id=${c}"
+MEM=${NODES}G
+SMP=${CORES},sockets=${NODES}
+CPUS_PER_NODE=$((CORES/NODES))
+for n in $(seq 0 $((NODES-1))); do
+    CPUS=$((CPUS_PER_NODE*n))-$((CPUS_PER_NODE*(n+1)-1))
+    SMP+=" -object memory-backend-ram,id=mem${n},size=1G"
+    SMP+=" -numa node,nodeid=${n},memdev=mem${n},cpus=${CPUS}"
 done
 
 for p in ${PLUGINS[@]}; do
