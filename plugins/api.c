@@ -198,6 +198,11 @@ bool qemu_plugin_tb_is_branch(const struct qemu_plugin_tb *tb)
     return tb->is_branch;
 }
 
+bool qemu_plugin_tb_is_pause(const struct qemu_plugin_tb *tb)
+{
+    return tb->is_pause;
+}
+
 uint64_t qemu_plugin_tb_next_pc(const struct qemu_plugin_tb *tb)
 {
     return tb->pc_next;

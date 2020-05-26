@@ -1091,6 +1091,10 @@ void helper_sysret(CPUX86State *env, int dflag)
                                DESC_S_MASK | (3 << DESC_DPL_SHIFT) |
                                DESC_W_MASK | DESC_A_MASK);
     }
+
+    /* TODO: pass the correct syscall number. */
+    qemu_plugin_vcpu_syscall_ret((CPUState *)container_of(env, X86CPU, env),
+                                 0, env->regs[R_EAX]);
 }
 #endif
 

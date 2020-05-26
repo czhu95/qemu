@@ -913,16 +913,15 @@ void plugin_gen_insn_end(target_ulong pc_next)
     plugin_gen_empty_callback(PLUGIN_GEN_AFTER_INSN);
 }
 
-void plugin_gen_tb_end(CPUState *cpu, bool is_branch, target_ulong pc_next)
+void plugin_gen_tb_end(CPUState *cpu, target_ulong pc_next, bool is_branch, bool is_pause)
 {
     struct qemu_plugin_tb *ptb = tcg_ctx->plugin_tb;
     int i;
 
-#if defined(TARGET_I386)
-    ptb->is_branch = is_branch;
     ptb->pc_next = pc_next;
+    ptb->is_branch = is_branch;
+    ptb->is_pause = is_pause;
     tcg_ctx->plugin_insn->pc_next = pc_next;
-#endif
 
     if (likely(ptb->haddr1 != NULL && ptb->vaddr2 == -1) &&
         unlikely(((ptb->pc_next - 1) & TARGET_PAGE_MASK) !=

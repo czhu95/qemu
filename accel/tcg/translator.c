@@ -46,6 +46,7 @@ void translator_loop(const TranslatorOps *ops, DisasContextBase *db,
     db->num_insns = 0;
     db->max_insns = max_insns;
     db->singlestep_enabled = cpu->singlestep_enabled;
+    db->is_pause = false;
 
     ops->init_disas_context(db, cpu);
     tcg_debug_assert(db->is_jmp == DISAS_NEXT);  /* no early exit */
@@ -130,7 +131,7 @@ void translator_loop(const TranslatorOps *ops, DisasContextBase *db,
     gen_tb_end(db->tb, db->num_insns - bp_insn);
 
     if (plugin_enabled) {
-        plugin_gen_tb_end(cpu, is_branch, db->pc_next);
+        plugin_gen_tb_end(cpu, db->pc_next, is_branch, db->is_pause);
     }
 
     /* The disas_log hook may use these values rather than recompute.  */

@@ -155,6 +155,7 @@ struct qemu_plugin_tb {
     void *haddr1;
     void *haddr2;
     bool is_branch;
+    bool is_pause;
     uint64_t pc_next;
     GArray *cbs[PLUGIN_N_CB_SUBTYPES];
 };
