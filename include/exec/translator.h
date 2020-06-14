@@ -75,6 +75,7 @@ typedef struct DisasContextBase {
     int max_insns;
     bool singlestep_enabled;
     bool is_pause;
+    bool is_cmpxchg;
 } DisasContextBase;
 
 /**

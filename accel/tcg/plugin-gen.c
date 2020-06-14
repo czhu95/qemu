@@ -905,10 +905,11 @@ void plugin_gen_insn_start(CPUState *cpu, const DisasContextBase *db)
     }
 }
 
-void plugin_gen_insn_end(target_ulong pc_next)
+void plugin_gen_insn_end(target_ulong pc_next, bool is_cmpxchg)
 {
 #if defined(TARGET_I386)
     tcg_ctx->plugin_insn->pc_next = pc_next;
+    tcg_ctx->plugin_insn->is_cmpxchg = is_cmpxchg;
 #endif
     plugin_gen_empty_callback(PLUGIN_GEN_AFTER_INSN);
 }

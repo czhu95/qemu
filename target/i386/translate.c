@@ -5327,6 +5327,7 @@ static target_ulong disas_insn(DisasContext *s, CPUState *cpu)
             tcg_temp_free(oldv);
             tcg_temp_free(newv);
             tcg_temp_free(cmpv);
+            s->base.is_cmpxchg = true;
         }
         break;
     case 0x1c7: /* cmpxchg8b */
@@ -5350,6 +5351,7 @@ static target_ulong disas_insn(DisasContext *s, CPUState *cpu)
                     gen_helper_cmpxchg16b_unlocked(cpu_env, s->A0);
                 }
                 set_cc_op(s, CC_OP_EFLAGS);
+                s->base.is_cmpxchg = true;
                 break;
             }
 #endif
@@ -5364,6 +5366,7 @@ static target_ulong disas_insn(DisasContext *s, CPUState *cpu)
                 gen_helper_cmpxchg8b_unlocked(cpu_env, s->A0);
             }
             set_cc_op(s, CC_OP_EFLAGS);
+            s->base.is_cmpxchg = true;
             break;
 
         case 7: /* RDSEED */

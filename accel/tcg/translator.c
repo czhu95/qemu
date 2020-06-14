@@ -63,6 +63,7 @@ void translator_loop(const TranslatorOps *ops, DisasContextBase *db,
 
     while (true) {
         db->num_insns++;
+        db->is_cmpxchg = false;
         ops->insn_start(db, cpu);
         tcg_debug_assert(db->is_jmp == DISAS_NEXT);  /* no early exit */
 
@@ -114,7 +115,7 @@ void translator_loop(const TranslatorOps *ops, DisasContextBase *db,
          * flow although this only really affects post-load operations.
          */
         if (plugin_enabled) {
-            plugin_gen_insn_end(db->pc_next);
+            plugin_gen_insn_end(db->pc_next, db->is_cmpxchg);
         }
 
         /* Stop translation if the output buffer is full,

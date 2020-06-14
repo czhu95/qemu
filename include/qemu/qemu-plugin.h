@@ -318,6 +318,7 @@ uint64_t qemu_plugin_insn_vaddr(const struct qemu_plugin_insn *insn);
 void *qemu_plugin_insn_haddr(const struct qemu_plugin_insn *insn);
 uint64_t qemu_plugin_insn_ram_addr(const struct qemu_plugin_insn *insn);
 uint64_t qemu_plugin_insn_next(const struct qemu_plugin_insn *insn);
+bool qemu_plugin_insn_is_cmpxchg(const struct qemu_plugin_insn *insn);
 
 /*
  * Memory Instrumentation

@@ -254,6 +254,11 @@ uint64_t qemu_plugin_insn_next(const struct qemu_plugin_insn *insn)
     return insn->pc_next;
 }
 
+bool qemu_plugin_insn_is_cmpxchg(const struct qemu_plugin_insn *insn)
+{
+    return insn->is_cmpxchg;
+}
+
 char *qemu_plugin_insn_disas(const struct qemu_plugin_insn *insn)
 {
     CPUState *cpu = current_cpu;
