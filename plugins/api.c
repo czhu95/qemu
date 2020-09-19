@@ -193,6 +193,16 @@ const void *qemu_plugin_tb_haddr2(const struct qemu_plugin_tb *tb)
     return tb->haddr2;
 }
 
+uint64_t qemu_plugin_tb_ram_addr(const struct qemu_plugin_tb *tb)
+{
+    return qemu_ram_addr_from_host(tb->haddr1);
+}
+
+uint64_t qemu_plugin_tb_ram_addr2(const struct qemu_plugin_tb *tb)
+{
+    return qemu_ram_addr_from_host(tb->haddr2);
+}
+
 bool qemu_plugin_tb_is_branch(const struct qemu_plugin_tb *tb)
 {
     return tb->is_branch;

@@ -301,6 +301,8 @@ uint64_t qemu_plugin_tb_vaddr(const struct qemu_plugin_tb *tb);
 uint64_t qemu_plugin_tb_vaddr2(const struct qemu_plugin_tb *tb);
 const void *qemu_plugin_tb_haddr(const struct qemu_plugin_tb *tb);
 const void *qemu_plugin_tb_haddr2(const struct qemu_plugin_tb *tb);
+uint64_t qemu_plugin_tb_ram_addr(const struct qemu_plugin_tb *tb);
+uint64_t qemu_plugin_tb_ram_addr2(const struct qemu_plugin_tb *tb);
 
 bool qemu_plugin_tb_is_branch(const struct qemu_plugin_tb *tb);
 bool qemu_plugin_tb_is_pause(const struct qemu_plugin_tb *tb);
